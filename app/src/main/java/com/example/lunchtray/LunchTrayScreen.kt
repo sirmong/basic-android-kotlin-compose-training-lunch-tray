@@ -16,15 +16,25 @@
 package com.example.lunchtray
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.lunchtray.datasource.DataSource
+import com.example.lunchtray.helpers.cancelOrderAndNavigateToStart
+import com.example.lunchtray.ui.AppBar
+import com.example.lunchtray.ui.EntreeMenuScreen
 import com.example.lunchtray.ui.OrderViewModel
+import com.example.lunchtray.ui.StartOrderScreen
 
 // TODO: Screen enum
 enum class Routes(@StringRes val title: Int) {
@@ -39,23 +49,53 @@ enum class Routes(@StringRes val title: Int) {
 
 @Composable
 fun LunchTrayApp() {
-    val navController: NavController = rememberNavController()
+    val navController: NavHostController = rememberNavController()
     // TODO: Create Controller and initialization
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Routes.valueOf(
         backStackEntry?.destination?.route ?: Routes.Start.name
     )
-
     // Create ViewModel
     val viewModel: OrderViewModel = viewModel()
 
     Scaffold(
         topBar = {
-            // TODO: AppBar
+            AppBar(
+                currentScreen = currentScreen,
+                canGoBack = navController.previousBackStackEntry != null,
+                navigateBack = navController::navigateUp
+            )
         }
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
-        // TODO: Navigation host
+        NavHost(
+            navController = navController,
+            startDestination = Routes.Start.name,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Routes.Start.name) {
+                StartOrderScreen(
+                    onStartOrderButtonClicked = { navController.navigate(Routes.EntreeMenu.name) },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            composable(Routes.EntreeMenu.name) {
+                EntreeMenuScreen(
+                    options = DataSource.entreeMenuItems,
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                    },
+                    onNextButtonClicked = { navController.navigate(Routes.SideDishMenu.name) },
+                    onSelectionChanged = {
+                        viewModel.updateEntree(it)
+                    }
+                )
+            }
+        }
     }
 }
