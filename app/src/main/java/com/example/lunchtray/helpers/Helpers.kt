@@ -4,10 +4,12 @@ import androidx.navigation.NavHostController
 import com.example.lunchtray.Routes
 import com.example.lunchtray.ui.OrderViewModel
 
-fun cancelOrderAndNavigateToStart(
-    viewModel: OrderViewModel,
-    navController: NavHostController
-) {
-    viewModel.resetOrder()
-    navController.popBackStack(Routes.Start.name, false)
+object Helpers {
+    fun cancelOrderAndNavigateToStart(
+        viewModel: OrderViewModel,
+        navController: NavHostController
+    ) {
+        viewModel.resetOrder()
+        navController.popBackStack(Routes.Start.name, false)
+    }
 }

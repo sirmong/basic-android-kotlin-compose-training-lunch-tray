@@ -30,7 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lunchtray.datasource.DataSource
-import com.example.lunchtray.helpers.cancelOrderAndNavigateToStart
+import com.example.lunchtray.helpers.Helpers
 import com.example.lunchtray.ui.AppBar
 import com.example.lunchtray.ui.EntreeMenuScreen
 import com.example.lunchtray.ui.OrderViewModel
@@ -85,7 +85,7 @@ fun LunchTrayApp() {
                 EntreeMenuScreen(
                     options = DataSource.entreeMenuItems,
                     onCancelButtonClicked = {
-                        cancelOrderAndNavigateToStart(
+                        Helpers.cancelOrderAndNavigateToStart(
                             viewModel,
                             navController
                         )
