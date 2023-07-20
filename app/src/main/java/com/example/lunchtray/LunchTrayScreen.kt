@@ -31,9 +31,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lunchtray.datasource.DataSource
 import com.example.lunchtray.helpers.Helpers
+import com.example.lunchtray.ui.AccompanimentMenuScreen
 import com.example.lunchtray.ui.AppBar
+import com.example.lunchtray.ui.CheckoutScreen
 import com.example.lunchtray.ui.EntreeMenuScreen
 import com.example.lunchtray.ui.OrderViewModel
+import com.example.lunchtray.ui.SideDishMenuScreen
 import com.example.lunchtray.ui.StartOrderScreen
 
 // TODO: Screen enum
@@ -91,10 +94,52 @@ fun LunchTrayApp() {
                         )
                     },
                     onNextButtonClicked = { navController.navigate(Routes.SideDishMenu.name) },
-                    onSelectionChanged = {
-                        viewModel.updateEntree(it)
-                    }
+                    onSelectionChanged = viewModel::updateEntree
                 )
+            }
+
+            composable(Routes.SideDishMenu.name) {
+                SideDishMenuScreen(
+                    options = DataSource.sideDishMenuItems,
+                    onCancelButtonClicked = {
+                        Helpers.cancelOrderAndNavigateToStart(viewModel, navController)
+                    },
+                    onNextButtonClicked = { navController.navigate(Routes.AccompanimentMenu.name) },
+                    onSelectionChanged = viewModel::updateSideDish
+
+                )
+            }
+
+            composable(Routes.AccompanimentMenu.name) {
+                AccompanimentMenuScreen(
+                    options = DataSource.accompanimentMenuItems,
+                    onCancelButtonClicked = {
+                        Helpers.cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                    },
+                    onNextButtonClicked = { navController.navigate(Routes.Checkout.name) },
+                    onSelectionChanged = viewModel::updateAccompaniment
+                )
+            }
+
+            composable(Routes.Checkout.name) {
+                CheckoutScreen(
+                    orderUiState = uiState,
+                    onNextButtonClicked = {
+                        Helpers.cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                        viewModel.resetOrder()
+                    },
+                    onCancelButtonClicked = {
+                        Helpers.cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                    })
             }
         }
     }
